@@ -22,36 +22,37 @@ Quarantine (move to a safe folder)
 Recovery (rename/copy only)
 Metadata snapshot (forensics only)
 
-3️⃣ Technologies Used Summary (Java)
-GUI Technologies
-Swing (javax.swing)	
-AWT (java.awt)	Layouts, colors, basic widgets
-FileDialog / JFileChooser	Selecting files/folders
-Layouts: BorderLayout, GridBagLayout	Arranging UI
+Technologies Used 
+GUI
 
-Cryptography Technologies
+Swing
+AWT
+FileDialog / JFileChooser
+Layouts (BorderLayout, GridBagLayout)
 
-AES-256 (AES/CBC/PKCS5Padding)	File encryption/decryption
-PBKDF2WithHmacSHA256	Convert password → AES key
-SecureRandom	Generate Salt + IV
-HMAC-SHA256	Authenticate encrypted content
-Salt & IV	Prevent attacks; ensure randomness
+Cryptography
 
-File I/O Technologies
+AES-256 (CBC mode + PKCS5Padding)
+PBKDF2WithHmacSHA256 (password → key)
+SecureRandom (Salt + IV generation)
+HMAC-SHA256 (integrity check)
+Salt & IV (security randomness)
 
-Java NIO (java.nio.file)	Safe file operations
-Files.walk()	Recursively scan directories
-Files.copy(), move(), delete()	Quarantine and recovery
-Streams (FileInputStream/FileOutputStream)	Byte-level reading/writing
+File I/O
 
-Concurrency Technologies
+Java NIO (java.nio.file)
+Files.walk()
+Files.copy(), Files.move(), Files.delete()
+FileInputStream / FileOutputStream
 
-Thread	Background scanning
-ExecutorService	Multi-threaded jobs
-SwingUtilities.invokeLater()	Update UI safely
-AtomicBoolean	Stop/pause signals
-Lambdas	Clean event handling
+Concurrency
 
+Thread
+ExecutorService
+SwingUtilities.invokeLater()
+AtomicBoolean
+
+Lambda expressions
 4️⃣ High-Level Workflow
 A. Simulation Module Workflow
 1. User selects target folder (JFileChooser)
