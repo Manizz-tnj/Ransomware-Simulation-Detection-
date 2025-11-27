@@ -1,107 +1,78 @@
-🛡️ Ransomware Simulation & Detection — Java (Safe, High-level Convert)
+🛡️ Java Ransomware Simulation & Detection — Structured Documentation (Educational Use Only)
+⚠️ For academic, research, and defensive security training only.
+⚠️ Use only in VMs / disposable test directories.
 
-⚠️ EDUCATIONAL USE ONLY — This is a high-level rewrite of your Python project for Java.
-Do NOT implement or run this against real/important files or on machines you don't own. Use disposable VMs, temporary folders, or dedicated test data. I’m giving a safe, conceptual mapping (no working encryption scripts or payloads).
+1️⃣ Project Overview
+This Java project demonstrates basic ransomware behavior (safe, controlled simulation) and a detection GUI tool for spotting suspicious encrypted files.
 
-📖 Overview (Java edition)
+It consists of 2 modules:
 
-Two Java tools (high-level design):
+A. Simulation Module (Simulation.java)
+Demonstrates file traversal.
+Creates encrypted copies (no destructive modification).
+Appends “.crypto” extension.
+Drops an educational RANSOM_NOTE.txt.
+Supports safe, reversible decryption (when password provided).
 
-Simulation.java — Educational demo only.
+B. Detection Module (Detector.java)
+Scans directories for suspicious extensions.
+Lists flagged files in a Swing GUI table.
+Allows:
+Quarantine (move to a safe folder)
+Recovery (rename/copy only)
+Metadata snapshot (forensics only)
 
-Demonstrates ransomware-like behavior conceptually: traverses a test directory, shows how files would be processed, and writes a ransom note.
-
-Important: Do not include or run real encryption logic on real files. If you implement encryption for research, keep it offline, auditable, and reversible (and never run on production data).
-
-Detector.java
-
-Scans directories for suspicious file markers (extensions, abrupt mass renames).
-
-Offers GUI actions to quarantine (move to a sandbox folder), snapshot metadata, or attempt safe recovery (e.g., rename copies).
-
-Recovery here must not include undisclosed decryption—only forensic-safe operations.
-
-🛠️ Technologies Used (mapped to Java)
+3️⃣ Technologies Used Summary (Java)
 GUI Technologies
+Swing (javax.swing)	
+AWT (java.awt)	Layouts, colors, basic widgets
+FileDialog / JFileChooser	Selecting files/folders
+Layouts: BorderLayout, GridBagLayout	Arranging UI
 
-Swing (javax.swing) — Primary cross-platform GUI framework for dialogs, lists, buttons, progress bars.
+Cryptography Technologies
 
-AWT (java.awt) — Lower-level components and layout helpers, file dialogs if needed.
-
-FileDialog / JFileChooser — Native file/folder selectors.
-
-Layout Managers — BorderLayout, GridBagLayout, BoxLayout, FlowLayout for arranging UI.
-
-Cryptography Technologies (conceptual / standards)
-
-Do not provide cryptographic implementations unless you understand legal/safety implications. If you must implement for controlled research, use well-tested libraries and consult security experts.
-
-AES-256 (AES/CBC/PKCS5Padding) — Standard block cipher and mode (use Java Cryptography Architecture / javax.crypto).
-
-PBKDF2WithHmacSHA256 — Password-based key derivation (SecretKeyFactory) to derive AES keys from passphrases.
-
-HMAC-SHA256 — Message authentication for integrity checks (Mac).
-
-SecureRandom — Generate salts and IVs securely.
-
-Salt, IV, iteration count — Security best practices (store metadata safely).
+AES-256 (AES/CBC/PKCS5Padding)	File encryption/decryption
+PBKDF2WithHmacSHA256	Convert password → AES key
+SecureRandom	Generate Salt + IV
+HMAC-SHA256	Authenticate encrypted content
+Salt & IV	Prevent attacks; ensure randomness
 
 File I/O Technologies
 
-Java NIO (java.nio.file) — Files.walk() for recursive traversal, Files.copy(), Files.move(), Files.delete() for robust, exception-aware file ops.
+Java NIO (java.nio.file)	Safe file operations
+Files.walk()	Recursively scan directories
+Files.copy(), move(), delete()	Quarantine and recovery
+Streams (FileInputStream/FileOutputStream)	Byte-level reading/writing
 
-Streams — FileInputStream / FileOutputStream for byte-level operations where necessary.
+Concurrency Technologies
 
-Path, Paths, StandardOpenOption — Modern handling of file paths & options.
+Thread	Background scanning
+ExecutorService	Multi-threaded jobs
+SwingUtilities.invokeLater()	Update UI safely
+AtomicBoolean	Stop/pause signals
+Lambdas	Clean event handling
 
-Concurrency & Responsiveness
+4️⃣ High-Level Workflow
+A. Simulation Module Workflow
+1. User selects target folder (JFileChooser)
+2. Program walks through all files (Files.walk)
+3. For each file:
+     → derive AES key using PBKDF2
+     → generate Salt + IV
+     → encrypt file contents (to file.crypto)
+     → write ransom note in folder
+4. Update GUI progress
+5. Decryption:
+     → user provides password
+     → reverse AES process for “.crypto” files
 
-Thread / ExecutorService — Background tasks for scans and file operations so UI doesn't freeze.
-
-SwingUtilities.invokeLater() — Run UI updates on the Event Dispatch Thread (EDT).
-
-AtomicBoolean / volatile — Thread-safe stop/paused flags.
-
-Lambda expressions — Cleaner listener/worker code (Java 8+).
-
-Security Concepts (for documentation / training)
-
-Salt — Random per-file/per-run data to harden KDFs.
-
-IV (Initialization Vector) — Per-file random IV for CBC mode.
-
-Key derivation — PBKDF2 iterations to slow brute-force attempts.
-
-HMAC — Authenticate encrypted payloads.
-
-Secure sandboxing — Always test in isolated environments.
-
-⚡ How it would work (high-level, safe)
-Simulation (safe mode)
-
-Traverse a test folder with Files.walk().
-
-For each target file: record metadata (size, modified time, hash) and optionally create a copy with a changed extension (e.g., .crypto) — but do not alter originals unless you control them.
-
-Drop a non-malicious RANSOM_NOTE.txt containing educational text in each folder.
-
-Provide a decryptor UI that only operates on the copies and requires a known passphrase stored only in test configs.
-
-Detection
-
-Scan directories and detect suspicious patterns:
-
-New or uncommon extensions (e.g., .crypto, .locked, .wannacry) in bulk.
-
-Sudden mass renames within short time windows.
-
-High file-entropy heuristics (optional, careful—can be noisy).
-
-Show results in a Swing table with options to:
-
-Quarantine → move suspicious files to a defined quarantine directory (use Files.move() with overwrite safeguards).
-
-Snapshot → copy files to a forensic folder (use Files.copy() preserving metadata).
-
-Rename safely → copy + rename copies rather than altering originals.
-
+B. Detection Module Workflow
+1. User selects directory to scan
+2. Detector searches for suspicious extensions:
+      .crypto, .locked, .enc, .wannacry, .ryuk
+3. Show results in Swing JTable
+4. User options:
+      → Quarantine: move file to /quarantine/
+      → Recover: copy then rename (safe)
+      → Snapshot: save metadata to JSON
+5. GUI shows progress with worker thread
